@@ -10,6 +10,12 @@ const ColorList = ({ colors, updateColors }) => {
   console.log(colors);
   const [editing, setEditing] = useState(false);
   const [colorToEdit, setColorToEdit] = useState(initialColor);
+  const [newColor, setNewColor] = useState(
+    {
+    color: '', 
+    code: {hex:''} 
+  });
+
 
 
   useEffect(() => {
@@ -45,6 +51,41 @@ const ColorList = ({ colors, updateColors }) => {
       })
 
   };
+
+  const changeHandler = ev => {
+    ev.persist();
+    let value = ev.target.value;
+
+    if (ev.target.name === 'hex') {
+      setNewColor({
+        ...newColor,
+        code: {hex: value}
+      });
+    } else {
+      setNewColor({
+        ...newColor,
+        [ev.target.name]: value
+      });
+    }
+
+    console.log('change', ev.target.name);
+    console.log('item after change', newColor);
+
+  };
+
+  const addColor = ev => {
+  ev.preventDefault()
+
+    // make a delete request to delete this color
+    console.log('add!!!!!!', newColor)
+
+    axiosWithAuth().post(`http://localhost:5000/api/colors`, newColor)
+    .then(res => {
+        console.log('res to delete with auth', res);
+      })
+
+  };
+
 
   return (
     <div className="colors-wrap">
@@ -99,8 +140,27 @@ const ColorList = ({ colors, updateColors }) => {
           </div>
         </form>
       )}
-      <div className="spacer" />
       {/* stretch - build another form here to add a color */}
+          <h4>Add Color</h4>
+          <form onSubmit={addColor}>
+            <input
+              type="text"
+              name="color"
+              onChange={changeHandler}
+              placeholder="color name"
+              value={newColor.name}
+            />
+            <input
+              type="text"
+              name="hex"
+              onChange={changeHandler}
+              placeholder="hex code"
+              value={newColor.hex}
+            />
+            <div className="button-row">
+            <button >Add</button>
+            </div>
+          </form>
     </div>
   );
 };
